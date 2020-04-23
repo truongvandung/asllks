@@ -1,12 +1,12 @@
 {
-    'name': 'Dynamic FormView Advance Odoo',
-    'summary': 'Dynamic FormView Advance Odoo',
+    'name': 'Dynamic FormView Advance',
+    'summary': 'Dynamic FormView Advance',
     'version': '1.0',
     'category': 'Web',
     'description': """
-        Dynamic FormView Advance Odoo
+        Dynamic FormView Advance. Change The Odoo Form view On the fly without any technical knowledge
     """,
-    'author': "truongdung.vd@gmail.com",
+    'author': "Yee Software",
     'depends': ['web'],
     'data': [
         'views/templates.xml',
@@ -17,7 +17,8 @@
         'static/src/xml/base.xml',
     ],
     'images': ['images/main_screen.jpg'],
-    'price': 250,
+    'price': 110,
+    'license': 'OPL-1',
     'currency': 'EUR',
     'installable': True,
     'auto_install': False,

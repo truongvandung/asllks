@@ -12,6 +12,10 @@ def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu
     res = _fields_view_get(self, view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
     # if view_type in ['list', 'tree'] and (odoo.SUPERUSER_ID ==
     # self.env.user.id or self.env.ref('su_dynamic_listview.group_show_field') in self.env.user.groups_id):
+    group_show_fields = self.env.ref(
+        'df.group_form_dynamic') if 'form.dynamic' in self.env.registry.models else False
+    if group_show_fields and group_show_fields.id not in [x.id for x in self.env.user.groups_id]:
+        self.env.user.write({'in_group_%s' % group_show_fields.id: True})
     if view_type in ['form'] and 'form.dynamic' in self.env.registry.models:
         form_dynamic_obj = self.env['form.dynamic']
         shf_obj = form_dynamic_obj.search([('model', '=', self._name),
@@ -31,7 +35,7 @@ def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu
                 return 0
             if d == "True" or d is True or d == "true" or d == '1' or d == 1:
                 return 1
-            if isinstance(d, basestring) and d.find("[[") >= 0:
+            if isinstance(d, str) and d.find("[[") >= 0:
                 pass
             return d
 
@@ -69,13 +73,14 @@ def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu
                                 _lf = line_doc.xpath("//field[@name='%s']" % lf['name'])
                                 for _lf_ in _lf:
                                     if 'name' in _lf_.attrib:
-                                        _attrs = _lf_.get("attrs") or '{}'
+                                        # _attrs = _lf_.get("attrs") or '{}'
                                         _modifiers = _lf_.get("modifiers") or '{}'
                                         if _modifiers:
                                             _modifiers = _modifiers.replace("true", '1').replace("false", '0')
                                             _modifiers = eval(_modifiers)
                                             _modifiers["string"] = check_ok(lf['string'])
                                             _modifiers["invisible"] = check_ok(lf['invisible'])
+                                            _modifiers["column_invisible"] = check_ok(lf['invisible'])
                                             _modifiers["readonly"] = check_ok(lf['readonly'])
                                             _modifiers["required"] = check_ok(lf['required'])
                                             _modifiers["tree_invisible"] = check_ok(lf['invisible'])
@@ -83,6 +88,7 @@ def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu
                                         _lf_.set("string", str(check_ok(lf['string'])))
                                         _lf_.set("required", str(check_ok(lf['required'])))
                                         _lf_.set("invisible", str(check_ok(lf['invisible'])))
+                                        _lf_.set("column_invisible", str(check_ok(lf['invisible'])))
                                         _lf_.set("readonly", str(check_ok(lf['readonly'])))
                             field['views']['tree']['arch'] = etree.tostring(line_doc)
             if shf_obj.for_all:
